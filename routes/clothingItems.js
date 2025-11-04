@@ -1,11 +1,27 @@
-const router = require('express').Router();
+const express = require('express');
+const {
+  getClothingItems,
+  createClothingItem,
+  deleteClothingItem,
+  likeClothingItem,
+  dislikeClothingItem,
+} = require('../controllers/clothingItems');
 
+const router = express.Router();
 
-const {createClothingItem, getClothingItems, updateClothingItem, deleteClothingItem } = require('../controllers/clothingItems');
-
-router.post('/', createClothingItem);
+// ✅ GET all items
 router.get('/', getClothingItems);
-router.put('/:id', updateClothingItem);
+
+// ✅ POST a new item
+router.post('/', createClothingItem);
+
+// ✅ DELETE an item by ID
 router.delete('/:id', deleteClothingItem);
+
+// ✅ PUT like on an item
+router.put('/:id/likes', likeClothingItem);
+
+// ✅ DELETE like (dislike) on an item
+router.delete('/:id/likes', dislikeClothingItem);
 
 module.exports = router;

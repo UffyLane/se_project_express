@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const clothingItemsRouter = require('./clothingItems');
 
-router.use('/clothing-items', clothingItemsRouter);
+// ✅ Mount the router at '/items' instead of '/clothing-items'
+router.use('/items', clothingItemsRouter);
 
+// 404 fallback route
 router.use((_req, res) => {
   res.status(404).json({ message: 'Not found' });
 });
 
 module.exports = router;
-
-
