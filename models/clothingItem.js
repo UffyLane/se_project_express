@@ -16,6 +16,21 @@ const clothingItemSchema = new mongoose.Schema({
       message: (props) => `${props.value} is not a valid weather type!`,
     },
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+  likes: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'user',
+    default: [],
+  },
   imageUrl: {
     type: String,
     required: [true, 'Image URL is required'],

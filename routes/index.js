@@ -1,5 +1,9 @@
 const router = require('express').Router();
 const clothingItemsRouter = require('./clothingItems');
+const usersRouter = require('./users');
+
+// ✅ Mount the users router at '/users'
+router.use('/users', usersRouter);
 
 // ✅ Mount the router at '/items' instead of '/clothing-items'
 router.use('/items', clothingItemsRouter);

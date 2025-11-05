@@ -22,7 +22,7 @@ const getClothingItems = async (_req, res) => {
 const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
-    const newItem = await ClothingItem.create({ name, weather, imageUrl });
+    const newItem = await ClothingItem.create({ name, weather, imageUrl, owner: req.user?._id || '000000000000000000000001' });
     res.status(201).json(newItem);
   } catch (err) {
     console.error(err);
