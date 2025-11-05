@@ -68,7 +68,7 @@ mongodb://127.0.0.1:27017/wtwr_db
 
 ### API Endpoints
 
-### 👕 Clothing Items
+ 👕 Clothing Items
 
 | Method     | Endpoint           | Description                |
 | ---------- | ------------------ | -------------------------- |
@@ -78,13 +78,176 @@ mongodb://127.0.0.1:27017/wtwr_db
 | **PUT**    | `/items/:id/likes` | Like an item               |
 | **DELETE** | `/items/:id/likes` | Remove like from an item   |
 
-### 🧍 Users
+🧍 Users
 
 | Method   | Endpoint     | Description       |
 | -------- | ------------ | ----------------- |
 | **GET**  | `/users`     | Get all users     |
 | **POST** | `/users`     | Create a new user |
 | **GET**  | `/users/:id` | Get a user by ID  |
+
+
+
+
+
+### 🧩 Example Requests & Responses
+
+➕ Create a Clothing Item 
+
+Request:
+
+POST /items
+Content-Type: application/json
+
+ Body:
+
+{
+  "name": "Blue Hoodie",
+  "weather": "cold",
+  "imageUrl": "https://example.com/hoodie.png"
+}
+
+
+ Response:
+
+{
+  "_id": "6731e54f22a839dc02b4f987",
+  "name": "Blue Hoodie",
+  "weather": "cold",
+  "imageUrl": "https://example.com/hoodie.png",
+  "likes": [],
+  "owner": "000000000000000000000001",
+  "createdAt": "2025-11-05T08:30:00.000Z"
+}
+
+🧾 Get All Clothing Items
+
+Request:
+
+GET /items
+
+
+Response: 
+
+[
+  {
+    "_id": "6731e54f22a839dc02b4f987",
+    "name": "Hoodie",
+    "weather": "cold",
+    "imageUrl": "https://example.com/hoodie.png",
+    "likes": [],
+    "owner": "000000000000000000000001",
+    "createdAt": "2025-11-05T08:30:00.000Z"
+  },
+  {
+    "_id": "6731e54f22a839dc02b4f988",
+    "name": "Cap",
+    "weather": "hot",
+    "imageUrl": "https://example.com/cap.png",
+    "likes": ["000000000000000000000001"],
+    "owner": "000000000000000000000001",
+    "createdAt": "2025-11-05T09:00:00.000Z"
+  }
+]
+
+❤️ Like a Clothing Item
+
+Request: 
+
+PUT /items/6731e54f22a839dc02b4f987/likes
+
+
+Response:
+
+{
+  "_id": "6731e54f22a839dc02b4f987",
+  "name": "Hoodie",
+  "weather": "cold",
+  "likes": ["000000000000000000000001"],
+  "owner": "000000000000000000000001",
+  "imageUrl": "https://example.com/hoodie.png"
+}
+
+
+💔 Remove Like from a Clothing Item
+
+Request:
+
+DELETE /items/6731e54f22a839dc02b4f987/likes
+
+Response:
+
+{
+  "_id": "6731e54f22a839dc02b4f987",
+  "name": "Hoodie",
+  "weather": "cold",
+  "likes": [],
+  "owner": "000000000000000000000001",
+  "imageUrl": "https://example.com/hoodie.png"
+}
+
+➕ Create a User
+
+Request:
+
+POST /users
+Content-Type: application/json
+
+
+Body:
+
+{
+  "name": "Stuart Clark",
+  "avatar": "https://example.com/avatar.jpg"
+}
+
+
+Response:
+
+{
+  "_id": "6731e52a22a839dc02b4f123",
+  "name": "Stuart Clark",
+  "avatar": "https://example.com/avatar.jpg",
+  "__v": 0
+}
+
+👀 Get All Users
+
+Request:
+
+GET /users
+
+
+Response:
+
+[
+  {
+    "_id": "6731e52a22a839dc02b4f123",
+    "name": "Stuart Clark",
+    "avatar": "https://example.com/avatar.jpg"
+  },
+  {
+    "_id": "6731e52a22a839dc02b4f124",
+    "name": "Sarah Green",
+    "avatar": "https://example.com/sarah.png"
+  }
+]
+
+🔎 Get User by ID
+
+Request:
+
+GET /users/6731e52a22a839dc02b4f123
+
+
+Response:
+
+{
+  "_id": "6731e52a22a839dc02b4f123",
+  "name": "Stuart Clark",
+  "avatar": "https://example.com/avatar.jpg"
+}
+
 
 
 ### 🚨 Error Handling
