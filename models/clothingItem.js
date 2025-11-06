@@ -38,12 +38,7 @@ const clothingItemSchema = new mongoose.Schema({
       validator: (v) => validator.isURL(v),
       message: 'Invalid image URL',
     },
-  },
-  likes: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'user',
-    default: [],
-  },
+  }
 });
 
 module.exports = mongoose.model('ClothingItem', clothingItemSchema);
