@@ -33,7 +33,7 @@ const createClothingItem = async (req, res) => {
         .json({ message: 'Invalid clothing item data' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Error creating clothing item' });
   }
@@ -71,7 +71,7 @@ const deleteClothingItem = async (req, res) => {
       return res.status(NOT_FOUND).json({ message: 'Item not found' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Error deleting clothing item' });
   }
@@ -107,7 +107,7 @@ const likeClothingItem = async (req, res) => {
       return res.status(NOT_FOUND).json({ message: 'Item not found' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Error liking clothing item' });
   }
@@ -141,7 +141,7 @@ const dislikeClothingItem = async (req, res) => {
       return res.status(NOT_FOUND).json({ message: 'Item not found' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Error disliking clothing item' });
   }

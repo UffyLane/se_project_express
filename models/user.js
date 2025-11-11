@@ -49,7 +49,7 @@ userSchema.methods.toJSON = function () {
 const bcrypt = require('bcryptjs');
 
 // Custom static method for verifying email + password
-userSchema.statics.findUserByCredentials = async function (email, password) {
+userSchema.statics.findUserByCredentials = async function findUserByCredentials(email, password) {
   // Find the user and explicitly include password since it's excluded by default
   const user = await this.findOne({ email }).select('+password');
 

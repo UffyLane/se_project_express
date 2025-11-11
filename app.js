@@ -1,10 +1,12 @@
 const express = require('express');
-const {login, createUser} = require('./controllers/users');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const {login, createUser} = require('./controllers/users');
 const mainRouter = require('./routes/index'); // ✅ use index.js as main router
 const auth = require('./middlewares/auth');
-
+const userRouter = require('./routes/users');
+const itemRouter = require('./routes/clothingItems');
+const { getItems } = require('./controllers/clothingItems');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -22,7 +24,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(() => ('✅ Connected to MongoDB'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // ✅ Mount all routes (users + items)
@@ -33,7 +35,7 @@ app.get('/', (_req, res) => {
   res.send('Welcome to the Clothing Items API ✅');
 });
 
-// ✅ Start server
+// eslint-disable-next-line no-console
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
