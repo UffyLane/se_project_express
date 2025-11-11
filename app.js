@@ -6,7 +6,7 @@ const mainRouter = require('./routes/index'); // ✅ use index.js as main router
 const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
 const itemRouter = require('./routes/clothingItems');
-const { getItems } = require('./controllers/clothingItems');
+const { getItems } = require('./controllers/clothingItems').default;
 
 const app = express();
 const { PORT = 3001 } = process.env;

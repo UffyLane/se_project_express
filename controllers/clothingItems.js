@@ -1,14 +1,10 @@
-const ClothingItem = require('../models/clothingItem');
-const {
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
-  NOT_FOUND,
-} = require('../utils/errors');
+import { find, create, findById, findByIdAndUpdate } from '../models/clothingItem';
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND } from '../utils/errors';
 
 // GET /items — return all clothing items
 const getClothingItems = async (_req, res) => {
   try {
-    const items = await ClothingItem.find({});
+    const items = await find({});
     res.status(200).json(items);
   } catch (err) {
     console.error(err);
@@ -22,7 +18,7 @@ const getClothingItems = async (_req, res) => {
 const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
-    const newItem = await ClothingItem.create({ name, weather, imageUrl, owner: req.user?._id || '000000000000000000000001' });
+    const newItem = await create({ name, weather, imageUrl, owner: req.user?._id || '000000000000000000000001' });
     res.status(201).json(newItem);
   } catch (err) {
     console.error(err);
@@ -45,7 +41,7 @@ const deleteClothingItem = async (req, res) => {
     const { id } = req.params;
 
     // Find the item first
-    const item = await ClothingItem.findById(id).orFail(() => {
+    const item = await findById(id).orFail(() => {
       const error = new Error('Item not found');
       error.statusCode = NOT_FOUND;
       throw error;
@@ -85,7 +81,7 @@ const likeClothingItem = async (req, res) => {
     // NOTE: Replace "req.user._id" with your real user ID (from auth later)
     const userId = req.user?._id || '000000000000000000000001';
 
-    const updatedItem = await ClothingItem.findByIdAndUpdate(
+    const updatedItem = await findByIdAndUpdate(
       id,
       { $addToSet: { likes: userId } }, // prevents duplicate likes
       { new: true }
@@ -119,7 +115,7 @@ const dislikeClothingItem = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?._id || '000000000000000000000001';
 
-    const updatedItem = await ClothingItem.findByIdAndUpdate(
+    const updatedItem = await findByIdAndUpdate(
       id,
       { $pull: { likes: userId } },
       { new: true }
@@ -147,7 +143,7 @@ const dislikeClothingItem = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getClothingItems,
   createClothingItem,
   deleteClothingItem,

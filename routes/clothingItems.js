@@ -5,7 +5,7 @@ const {
   deleteClothingItem,
   likeClothingItem,
   dislikeClothingItem,
-} = require('../controllers/clothingItems');
+} = require('../controllers/clothingItems').default;
 
 const router = express.Router();
 
