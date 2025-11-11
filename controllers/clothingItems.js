@@ -5,7 +5,7 @@ import { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND } from '../utils/errors';
 const getClothingItems = async (_req, res) => {
   try {
     const items = await find({});
-    res.status(200).json(items);
+   return res.status(200).json(items);
   } catch (err) {
     console.error(err);
     res
@@ -19,7 +19,7 @@ const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
     const newItem = await create({ name, weather, imageUrl, owner: req.user?._id || '000000000000000000000001' });
-    res.status(201).json(newItem);
+    return res.status(201).json(newItem);
   } catch (err) {
     console.error(err);
 
@@ -55,7 +55,7 @@ const deleteClothingItem = async (req, res) => {
     }
 
     await item.deleteOne();
-    res.status(200).json({ message: 'Item deleted successfully' });
+    return res.status(200).json({ message: 'Item deleted successfully' });
   } catch (err) {
     console.error(err);
 
@@ -91,7 +91,7 @@ const likeClothingItem = async (req, res) => {
       throw error;
     });
 
-    res.status(200).json(updatedItem);
+    return res.status(200).json(updatedItem);
   } catch (err) {
     console.error(err);
 
@@ -125,7 +125,7 @@ const dislikeClothingItem = async (req, res) => {
       throw error;
     });
 
-    res.status(200).json(updatedItem);
+    return res.status(200).json(updatedItem);
   } catch (err) {
     console.error(err);
 

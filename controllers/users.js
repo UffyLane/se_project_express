@@ -10,47 +10,6 @@ const {
 } = require('../utils/errors');
 const { UNAUTHORIZED } = require('../utils/errors');
 
-// PATCH /users/:id — update user info (name and avatar)
-const updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, avatar } = req.body;
-
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { name, avatar },
-      {
-        new: true, // return the updated document
-        runValidators: true, // run schema validators
-      }
-    ).orFail(() => {
-      const error = new Error('User not found');
-      error.statusCode = NOT_FOUND;
-      throw error;
-    });
-
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    console.error(err);
-
-    if (err.name === 'ValidationError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid user data' });
-    }
-
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid user ID' });
-    }
-
-    if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).json({ message: 'User not found' });
-    }
-
-    res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Error updating user information' });
-  }
-};
-
 // POST /login — authenticate user and return JWT
 const login = async (req, res) => {
   try {
@@ -62,12 +21,12 @@ const login = async (req, res) => {
     // Create token with 7-day expiration
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(200).json({ token });
+   return res.status(200).json({ token });
   } catch (err) {
     console.error(err);
 
     // If authentication fails, send 401
-    res.status(UNAUTHORIZED).json({ message: 'Invalid email or password' });
+    return res.status(UNAUTHORIZED).json({ message: 'Invalid email or password' });
   }
 };
 
@@ -76,10 +35,10 @@ const getUsers = async (_req, res) => {
   try {
     // ✅ Explicitly exclude password
     const users = await User.find({}, '-password');
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (err) {
     console.error(err);
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Internal server error' });
   }
@@ -94,7 +53,7 @@ const getCurrentUser = async (req, res) => {
       throw error;
     });
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (err) {
     console.error(err);
 
@@ -134,7 +93,7 @@ const createUser = async (req, res) => {
     const userWithoutPassword = newUser.toObject();
     delete userWithoutPassword.password;
 
-    res.status(201).json(userWithoutPassword);
+    return res.status(201).json(userWithoutPassword);
   } catch (err) {
     console.error(err);
 
@@ -167,7 +126,7 @@ const updateCurrentUser = async (req, res) => {
       throw error;
     });
 
-    res.status(200).json(updatedUser);
+    return res.status(200).json(updatedUser);
   } catch (err) {
     console.error(err);
 
