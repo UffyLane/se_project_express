@@ -1,7 +1,10 @@
 const express = require('express');
+const {login, createUser} = require('./controllers/users');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const mainRouter = require('./routes/index'); // ✅ use index.js as main router
+const auth = require('./middlewares/auth');
+
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -34,5 +37,17 @@ app.get('/', (_req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+// Public routes
+app.post('/signup', createUser);
+app.post('/signin', login);
+app.get('/items', getItems); // this one stays public
+
+// Protect all routes below this line
+app.use(auth);
+
+// Protected routes
+app.use('/users', userRouter);
+app.use('/items', itemRouter);
 
 module.exports = app;

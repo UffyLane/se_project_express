@@ -43,13 +43,23 @@ const createClothingItem = async (req, res) => {
 const deleteClothingItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedItem = await ClothingItem.findByIdAndDelete(id).orFail(() => {
+
+    // Find the item first
+    const item = await ClothingItem.findById(id).orFail(() => {
       const error = new Error('Item not found');
       error.statusCode = NOT_FOUND;
       throw error;
     });
 
-    res.status(200).json({ message: 'Item deleted successfully', deletedItem });
+    // ✅ Check ownership before deleting
+    if (item.owner.toString() !== req.user._id) {
+      return res
+        .status(403)
+        .json({ message: 'You are not allowed to delete this item' });
+    }
+
+    await item.deleteOne();
+    res.status(200).json({ message: 'Item deleted successfully' });
   } catch (err) {
     console.error(err);
 
@@ -66,6 +76,7 @@ const deleteClothingItem = async (req, res) => {
       .json({ message: 'Error deleting clothing item' });
   }
 };
+
 
 // PUT /items/:id/likes — add a like
 const likeClothingItem = async (req, res) => {
