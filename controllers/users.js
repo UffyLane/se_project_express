@@ -1,39 +1,35 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { JWT_SECRET } = require('../utils/config');
+const { JWT_SECRET } = require('../utils/config'); // ← removed ".js"
 const User = require('../models/user');
 const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
   CONFLICT,
+  UNAUTHORIZED,
 } = require('../utils/errors');
-const { UNAUTHORIZED } = require('../utils/errors');
 
 // POST /login — authenticate user and return JWT
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Use custom mongoose method to verify credentials
     const user = await User.findUserByCredentials(email, password);
-
-    // Create token with 7-day expiration
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
-   return res.status(200).json({ token });
+    return res.status(200).json({ token });
   } catch (err) {
     console.error(err);
-
-    // If authentication fails, send 401
-    return res.status(UNAUTHORIZED).json({ message: 'Invalid email or password' });
+    return res
+      .status(UNAUTHORIZED)
+      .json({ message: 'Invalid email or password' });
   }
 };
 
 // GET /users — return all users (without passwords)
 const getUsers = async (_req, res) => {
   try {
-    // ✅ Explicitly exclude password
     const users = await User.find({}, '-password');
     return res.status(200).json(users);
   } catch (err) {
@@ -44,7 +40,7 @@ const getUsers = async (_req, res) => {
   }
 };
 
-/// GET /users/me — return the current authorized user
+// GET /users/me — return the current authorized user
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id, '-password').orFail(() => {
@@ -65,20 +61,21 @@ const getCurrentUser = async (req, res) => {
       return res.status(NOT_FOUND).json({ message: 'User not found' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Internal server error' });
   }
 };
 
-
-// POST /users — create new user (with password hashing and duplicate handling)
+// POST /users — create new user
 const createUser = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(BAD_REQUEST).json({ message: 'Email and password are required' });
+      return res
+        .status(BAD_REQUEST)
+        .json({ message: 'Email and password are required' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -98,14 +95,18 @@ const createUser = async (req, res) => {
     console.error(err);
 
     if (err.code === 11000) {
-      return res.status(CONFLICT).json({ message: 'User with this email already exists' });
+      return res
+        .status(CONFLICT)
+        .json({ message: 'User with this email already exists' });
     }
 
     if (err.name === 'ValidationError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid user data' });
+      return res
+        .status(BAD_REQUEST)
+        .json({ message: 'Invalid user data' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'An error occurred while creating user' });
   }
@@ -119,7 +120,7 @@ const updateCurrentUser = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, avatar },
-      { new: true, runValidators: true } // ✅ ensures validation runs
+      { new: true, runValidators: true }
     ).orFail(() => {
       const error = new Error('User not found');
       error.statusCode = NOT_FOUND;
@@ -131,19 +132,22 @@ const updateCurrentUser = async (req, res) => {
     console.error(err);
 
     if (err.name === 'ValidationError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid user data' });
+      return res
+        .status(BAD_REQUEST)
+        .json({ message: 'Invalid user data' });
     }
 
     if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).json({ message: 'User not found' });
+      return res
+        .status(NOT_FOUND)
+        .json({ message: 'User not found' });
     }
 
-    res
+    return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'An error occurred while updating user' });
   }
 };
-
 
 module.exports = {
   getUsers,
