@@ -35,9 +35,9 @@ app.get('/', (_req, res) => {
   res.send('Welcome to the Clothing Items API ✅');
 });
 
-// eslint-disable-next-line no-console
+// ✅ Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.warn(`🚀 Server running on http://localhost:${PORT}`);
 });
 
 // Public routes
