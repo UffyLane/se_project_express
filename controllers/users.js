@@ -11,21 +11,32 @@ const {
 } = require('../utils/errors');
 
 // POST /login — authenticate user and return JWT
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    // custom method that throws UnauthorizedError correctly
     const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     return res.status(200).json({ token });
   } catch (err) {
     console.error(err);
-    return res
-      .status(UNAUTHORIZED)
-      .json({ message: 'Invalid email or password' });
+
+    // If it's wrong credentials, respond with 401
+    if (err.statusCode === UNAUTHORIZED) {
+      return res.status(UNAUTHORIZED).json({ message: err.message });
+    }
+
+    // Everything else is a server error
+    return next(err);
   }
 };
+
+
 
 // GET /users — return all users (without passwords)
 const getUsers = async (_req, res) => {

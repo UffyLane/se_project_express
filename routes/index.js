@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { NOT_FOUND } = require('../utils/errors');
 const clothingItemsRouter = require('./clothingItems');
 const usersRouter = require('./users');
 
@@ -10,7 +11,7 @@ router.use('/items', clothingItemsRouter);
 
 // 404 fallback route
 router.use((_req, res) => {
-  res.status(404).json({ message: 'Not found' });
+  res.status(NOT_FOUND).json({ message: 'Not found' });
 });
 
 module.exports = router;

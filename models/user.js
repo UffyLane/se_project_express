@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
+      required: true,
       default: 'https://avatars.githubusercontent.com/u/placeholder',
       validate: {
         validator(url) {

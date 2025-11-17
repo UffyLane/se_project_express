@@ -28,15 +28,6 @@ mongoose
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 
-  // ✅ Temporary test middleware to set default user ID
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5d8b8592978f8bd833ca8133', // required by tests
-  };
-  next();
-});
-
-
 // ✅ Root route
 app.get('/', (_req, res) => {
   res.send('Welcome to the Clothing Items API ✅');

@@ -3,6 +3,7 @@ const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  FORBIDDEN,
 } = require('../utils/errors');
 
 // GET /items — return all clothing items
@@ -58,7 +59,7 @@ const deleteClothingItem = async (req, res) => {
 
     if (item.owner.toString() !== req.user._id) {
       return res
-        .status(403)
+        .status(FORBIDDEN)
         .json({ message: 'You are not allowed to delete this item' });
     }
 
