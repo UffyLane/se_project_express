@@ -283,6 +283,12 @@ Uses .orFail() for Mongoose not-found safety
 
 Ready for future integration with authentication
 
+## Project Pitch Video
+ 
+ Check out [this video](https://drive.google.com/file/d/1pmrpI_lWSCbW2T_Jc3rlDDFZBXiNsZu9/view?usp=sharing), where I describe my 
+ project and some challenges I faced while building it.
+
+
 ### 👤 Author
 
 Stuart G. Clark Jr.
