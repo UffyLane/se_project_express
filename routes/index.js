@@ -2,6 +2,13 @@ const router = require('express').Router();
 const { NOT_FOUND } = require('../utils/errors');
 const clothingItemsRouter = require('./clothingItems');
 const usersRouter = require('./users');
+const { login, createUser } = require('../controllers/users');
+const auth = require('../middlewares/auth');
+
+router.post('/signup', createUser);  // public
+router.post('/signin', login);       // public
+
+router.use(auth); // protect all routes below this line
 
 // ✅ Mount the users router at '/users'
 router.use('/users', usersRouter);

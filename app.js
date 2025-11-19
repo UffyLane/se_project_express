@@ -4,7 +4,6 @@ const cors = require('cors');
 const { getClothingItems: getItems } = require('./controllers/clothingItems');
 const userRouter = require('./routes/users');
 const itemRouter = require('./routes/clothingItems');
-const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { NOT_FOUND } = require('./utils/errors');
 
@@ -33,9 +32,7 @@ app.get('/', (_req, res) => {
   res.send('Welcome to the Clothing Items API ✅');
 });
 
-// ✅ Public routes
-app.post('/signup', createUser);
-app.post('/signin', login);
+// ✅ Public route to get clothing items
 app.get('/items', getItems); // stays public
 
 // ✅ Protected routes

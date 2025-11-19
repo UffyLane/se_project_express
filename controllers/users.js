@@ -10,12 +10,19 @@ const {
   UNAUTHORIZED,
 } = require('../utils/errors');
 
-// POST /login — authenticate user and return JWT
+ // Your custom static method handles incorrect credentials
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // custom method that throws UnauthorizedError correctly
+    // ✅ Required WTWR 400 validation
+    if (!email || !password) {
+      return res
+        .status(BAD_REQUEST)
+        .json({ message: 'Email and password are required' });
+    }
+
+    // Your custom static method handles incorrect credentials
     const user = await User.findUserByCredentials(email, password);
 
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -26,15 +33,16 @@ const login = async (req, res, next) => {
   } catch (err) {
     console.error(err);
 
-    // If it's wrong credentials, respond with 401
+    // Only wrong email/password → 401
     if (err.statusCode === UNAUTHORIZED) {
       return res.status(UNAUTHORIZED).json({ message: err.message });
     }
 
-    // Everything else is a server error
+    // Everything else → pass to central error handler
     return next(err);
   }
 };
+
 
 
 

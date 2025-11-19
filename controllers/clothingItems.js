@@ -28,7 +28,7 @@ const createClothingItem = async (req, res) => {
       name,
       weather,
       imageUrl,
-      owner: req.user?._id || '000000000000000000000001',
+      owner: req.user?._id,
     });
     return res.status(201).json(newItem);
   } catch (err) {
@@ -86,7 +86,7 @@ const deleteClothingItem = async (req, res) => {
 const likeClothingItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?._id || '000000000000000000000001';
+    const userId = req.user?._id;
 
     const updatedItem = await ClothingItem.findByIdAndUpdate(
       id,
@@ -120,7 +120,7 @@ const likeClothingItem = async (req, res) => {
 const dislikeClothingItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?._id || '000000000000000000000001';
+    const userId = req.user?._id;
 
     const updatedItem = await ClothingItem.findByIdAndUpdate(
       id,
