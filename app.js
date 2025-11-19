@@ -1,53 +1,38 @@
 const express = require('express');
 const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const helmet = require('helmet');
 const cors = require('cors');
-const { getClothingItems: getItems } = require('./controllers/clothingItems');
-const userRouter = require('./routes/users');
-const itemRouter = require('./routes/clothingItems');
-const auth = require('./middlewares/auth');
+const routes = require('./routes'); // CENTRAL ROUTER
 const { NOT_FOUND } = require('./utils/errors');
 
 const app = express();
 const { PORT = 3001 } = process.env;
 
-// ✅ MongoDB connection string
+// DB URL
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/wtwr_db';
 
-// ✅ Middleware
+// Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// ✅ Connect to MongoDB
+// DB connect
 mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(MONGO_URI)
   .then(() => console.warn('✅ Connected to MongoDB'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
+// Mount central router (handles signup, signin, auth-protected routes)
+app.use(routes);
 
-// ✅ Root route
-app.get('/', (_req, res) => {
-  res.send('Welcome to the Clothing Items API ✅');
-});
-
-// ✅ Public route to get clothing items
-app.get('/items', getItems); // stays public
-
-// ✅ Protected routes
-app.use(auth);
-app.use('/users', userRouter);
-app.use('/items', itemRouter);
-
-// ✅ Handle unknown routes
+// Unknown route handler
 app.use('*', (_req, res) => {
   res.status(NOT_FOUND).json({ message: 'Requested resource not found' });
 });
 
-// ✅ Start server
+// Start server
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.warn(`🚀 Server running on http://localhost:${PORT}`);
 });
 

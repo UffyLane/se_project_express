@@ -5,23 +5,23 @@ const {
   deleteClothingItem,
   likeClothingItem,
   dislikeClothingItem,
-} = require('../controllers/clothingItems'); // ❌ removed .default
+} = require('../controllers/clothingItems');
 
 const router = express.Router();
 
-// ✅ GET all items
+// GET all items
 router.get('/', getClothingItems);
 
-// ✅ POST a new item
+// POST a new item
 router.post('/', createClothingItem);
 
-// ✅ DELETE an item by ID
-router.delete('/:id', deleteClothingItem);
+// DELETE an item by ID
+router.delete('/:itemId', deleteClothingItem);
 
-// ✅ PUT like on an item
-router.put('/:id/likes', likeClothingItem);
+// LIKE an item
+router.put('/:itemId/likes', likeClothingItem);
 
-// ✅ DELETE like (dislike) on an item
-router.delete('/:id/likes', dislikeClothingItem);
+// DISLIKE an item
+router.delete('/:itemId/likes', dislikeClothingItem);
 
 module.exports = router;

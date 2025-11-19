@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { JWT_SECRET } = require('../utils/config'); // ← removed ".js"
+const { JWT_SECRET } = require('../utils/config');
 const User = require('../models/user');
 const {
   BAD_REQUEST,
@@ -10,19 +10,17 @@ const {
   UNAUTHORIZED,
 } = require('../utils/errors');
 
- // Your custom static method handles incorrect credentials
+// POST /signin — authenticate user and return JWT
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ Required WTWR 400 validation
     if (!email || !password) {
       return res
         .status(BAD_REQUEST)
         .json({ message: 'Email and password are required' });
     }
 
-    // Your custom static method handles incorrect credentials
     const user = await User.findUserByCredentials(email, password);
 
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -33,29 +31,14 @@ const login = async (req, res, next) => {
   } catch (err) {
     console.error(err);
 
-    // Only wrong email/password → 401
-    if (err.statusCode === UNAUTHORIZED) {
+    if (
+      err.statusCode === UNAUTHORIZED ||
+      err.name === 'UnauthorizedError'
+    ) {
       return res.status(UNAUTHORIZED).json({ message: err.message });
     }
 
-    // Everything else → pass to central error handler
     return next(err);
-  }
-};
-
-
-
-
-// GET /users — return all users (without passwords)
-const getUsers = async (_req, res) => {
-  try {
-    const users = await User.find({}, '-password');
-    return res.status(200).json(users);
-  } catch (err) {
-    console.error(err);
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Internal server error' });
   }
 };
 
@@ -86,7 +69,7 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-// POST /users — create new user
+// POST /signup — create new user
 const createUser = async (req, res) => {
   try {
     const { name, avatar, email, password } = req.body;
@@ -169,7 +152,6 @@ const updateCurrentUser = async (req, res) => {
 };
 
 module.exports = {
-  getUsers,
   createUser,
   getCurrentUser,
   updateCurrentUser,

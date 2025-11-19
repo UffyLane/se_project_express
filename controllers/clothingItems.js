@@ -13,7 +13,6 @@ const getClothingItems = async (_req, res) => {
     return res.status(200).json(items);
   } catch (err) {
     console.error(err);
-    // ✅ add "return" here so ESLint sees a return in every path
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ message: 'Failed to fetch clothing items' });
@@ -24,12 +23,14 @@ const getClothingItems = async (_req, res) => {
 const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
+
     const newItem = await ClothingItem.create({
       name,
       weather,
       imageUrl,
-      owner: req.user?._id,
+      owner: req.user._id,   // FIXED
     });
+
     return res.status(201).json(newItem);
   } catch (err) {
     console.error(err);
@@ -46,18 +47,19 @@ const createClothingItem = async (req, res) => {
   }
 };
 
-// DELETE /items/:id — delete a clothing item
+// DELETE /items/:itemId — delete a clothing item
 const deleteClothingItem = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { itemId } = req.params;  // FIXED
 
-    const item = await ClothingItem.findById(id).orFail(() => {
+    const item = await ClothingItem.findById(itemId).orFail(() => {
       const error = new Error('Item not found');
       error.statusCode = NOT_FOUND;
       throw error;
     });
 
-    if (item.owner.toString() !== req.user._id) {
+    // Only owner can delete
+    if (String(item.owner) !== String(req.user._id)) {  // FIXED
       return res
         .status(FORBIDDEN)
         .json({ message: 'You are not allowed to delete this item' });
@@ -82,14 +84,14 @@ const deleteClothingItem = async (req, res) => {
   }
 };
 
-// PUT /items/:id/likes — add a like
+// PUT /items/:itemId/likes — add a like
 const likeClothingItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const userId = req.user?._id;
+    const { itemId } = req.params;  // FIXED
+    const userId = req.user._id;    // FIXED
 
     const updatedItem = await ClothingItem.findByIdAndUpdate(
-      id,
+      itemId,
       { $addToSet: { likes: userId } },
       { new: true }
     ).orFail(() => {
@@ -116,14 +118,14 @@ const likeClothingItem = async (req, res) => {
   }
 };
 
-// DELETE /items/:id/likes — remove a like
+// DELETE /items/:itemId/likes — remove a like
 const dislikeClothingItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const userId = req.user?._id;
+    const { itemId } = req.params;   // FIXED
+    const userId = req.user._id;     // FIXED
 
     const updatedItem = await ClothingItem.findByIdAndUpdate(
-      id,
+      itemId,
       { $pull: { likes: userId } },
       { new: true }
     ).orFail(() => {

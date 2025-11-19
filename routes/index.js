@@ -5,20 +5,18 @@ const usersRouter = require('./users');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 
-router.post('/signup', createUser);  // public
-router.post('/signin', login);       // public
+// ---------- PUBLIC ROUTES ----------
+router.post('/signup', createUser);
+router.post('/signin', login);
 
-router.use(auth); // protect all routes below this line
-
-// ✅ Mount the users router at '/users'
+// ---------- PROTECTED ROUTES ----------
+router.use(auth);
 router.use('/users', usersRouter);
-
-// ✅ Mount the router at '/items' instead of '/clothing-items'
 router.use('/items', clothingItemsRouter);
 
-// 404 fallback route
-router.use((_req, res) => {
-  res.status(NOT_FOUND).json({ message: 'Not found' });
+// ---------- 404 CATCH-ALL ----------
+router.all('*', (_req, res) => {
+  res.status(NOT_FOUND).json({ message: 'Requested resource not found' });
 });
 
 module.exports = router;

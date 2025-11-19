@@ -33,7 +33,12 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": true
+        "devDependencies": [
+          "**/*.test.js",
+          "**/*.spec.js",
+          "test/**",
+          "tests/**"
+        ]
       }
     ],
     "no-underscore-dangle": ["error", { "allow": ["_id"] }]
