@@ -11,10 +11,12 @@ const {
 } = require('../utils/errors');
 
 // POST /signin — authenticate user and return JWT
-const login = async (req, res, next) => {
+// POST /signin — authenticate user and return JWT
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Required WTWR validation
     if (!email || !password) {
       return res
         .status(BAD_REQUEST)
@@ -31,16 +33,25 @@ const login = async (req, res, next) => {
   } catch (err) {
     console.error(err);
 
+    // WTWR-required check — ONLY use message
     if (
-      err.statusCode === UNAUTHORIZED ||
-      err.name === 'UnauthorizedError'
+      err.message === 'Invalid email or password' ||
+      err.message.includes('Invalid email or password')
     ) {
-      return res.status(UNAUTHORIZED).json({ message: err.message });
+      return res
+        .status(UNAUTHORIZED)
+        .json({ message: 'Invalid email or password' });
     }
 
-    return next(err);
+
+    // return 500 here
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ message: 'Internal server error' });
   }
 };
+
+
 
 // GET /users/me — return the current authorized user
 const getCurrentUser = async (req, res) => {
