@@ -4,10 +4,23 @@ const clothingItemsRouter = require('./clothingItems');
 const usersRouter = require('./users');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
+const ClothingItem = require('../models/clothingItem');
+
 
 // ---------- PUBLIC ROUTES ----------
 router.post('/signup', createUser);
 router.post('/signin', login);
+
+// >>> PUBLIC GET /items <<<
+router.get("/items", async (req, res) => {
+  try {
+    const items = await ClothingItem.find({});
+    res.send(items);
+  } catch (err) {
+    res.status(500).send({ message: "Server error" });
+  }
+});
+
 
 // ---------- PROTECTED ROUTES ----------
 router.use(auth);
