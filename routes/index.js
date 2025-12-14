@@ -1,15 +1,15 @@
 const router = require('express').Router();
-const { NOT_FOUND } = require('../utils/errors');
 const clothingItemsRouter = require('./clothingItems');
 const usersRouter = require('./users');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const ClothingItem = require('../models/clothingItem');
+const { validateLogin, validateCreateUser } = require('../middlewares/validation');
 
 
 // ---------- PUBLIC ROUTES ----------
-router.post('/signup', createUser);
-router.post('/signin', login);
+router.post('/signup', validateCreateUser, createUser);
+router.post('/signin', validateLogin, login);
 
 // >>> PUBLIC GET /items <<<
 router.get("/items", async (req, res) => {

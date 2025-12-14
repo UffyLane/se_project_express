@@ -1,163 +1,106 @@
-
-
 const ClothingItem = require('../models/clothingItem');
-const {
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
-  NOT_FOUND,
-  FORBIDDEN,
-} = require('../utils/errors');
 
-// GET /items — return all clothing items
-const getClothingItems = async (_req, res) => {
-  try {
-    const items = await ClothingItem.find({});
-    return res.status(200).json(items);
-  } catch (err) {
-    console.error(err);
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Failed to fetch clothing items' });
-  }
+// Custom Error Classes
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+
+// =========================================
+// GET /items — get all clothing items
+// =========================================
+module.exports.getClothingItems = (req, res, next) => {
+  ClothingItem.find({})
+    .then((items) => res.send(items))
+    .catch(next);
 };
 
-// POST /items — create a new clothing item
-const createClothingItem = async (req, res) => {
-  try {
-    const { name, weather, imageUrl } = req.body;
+// =========================================
+// POST /items — create new item
+// =========================================
+module.exports.createClothingItem = (req, res, next) => {
+  const { name, weather, imageUrl } = req.body;
 
-    const newItem = await ClothingItem.create({
-      name,
-      weather,
-      imageUrl,
-      owner: req.user._id,   // FIXED
+  ClothingItem.create({
+    name,
+    weather,
+    imageUrl,
+    owner: req.user._id,
+  })
+    .then((item) => res.status(201).send(item))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestError('Invalid clothing item data'));
+      }
+      return next(err);
     });
-
-    return res.status(201).json(newItem);
-  } catch (err) {
-    console.error(err);
-
-    if (err.name === 'ValidationError') {
-      return res
-        .status(BAD_REQUEST)
-        .json({ message: 'Invalid clothing item data' });
-    }
-
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Error creating clothing item' });
-  }
 };
 
-// DELETE /items/:itemId — delete a clothing item
-const deleteClothingItem = async (req, res) => {
-  try {
-    const { itemId } = req.params;  // FIXED
+// =========================================
+// DELETE /items/:itemId — delete item
+// Only owner can delete
+// =========================================
+module.exports.deleteClothingItem = (req, res, next) => {
+  const { itemId } = req.params;
 
-    const item = await ClothingItem.findById(itemId).orFail(() => {
-      const error = new Error('Item not found');
-      error.statusCode = NOT_FOUND;
-      throw error;
+  ClothingItem.findById(itemId)
+    .orFail(() => new NotFoundError('Item not found'))
+    .then((item) => {
+      if (String(item.owner) !== String(req.user._id)) {
+        throw new ForbiddenError('You are not allowed to delete this item');
+      }
+
+      return item.deleteOne().then(() => {
+        res.send({ message: 'Item deleted successfully' });
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Invalid item ID format'));
+      }
+      return next(err);
     });
-
-    // Only owner can delete
-    if (String(item.owner) !== String(req.user._id)) {  // FIXED
-      return res
-        .status(FORBIDDEN)
-        .json({ message: 'You are not allowed to delete this item' });
-    }
-
-    await item.deleteOne();
-    return res.status(200).json({ message: 'Item deleted successfully' });
-  } catch (err) {
-    console.error(err);
-
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid item ID' });
-    }
-
-    if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).json({ message: 'Item not found' });
-    }
-
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Error deleting clothing item' });
-  }
 };
 
-// PUT /items/:itemId/likes — add a like
-const likeClothingItem = async (req, res) => {
-  try {
-    const { itemId } = req.params;  // FIXED
-    const userId = req.user._id;    // FIXED
+// =========================================
+// PUT /items/:itemId/likes — like an item
+// =========================================
+module.exports.likeClothingItem = (req, res, next) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
 
-    const updatedItem = await ClothingItem.findByIdAndUpdate(
-      itemId,
-      { $addToSet: { likes: userId } },
-      { new: true }
-    ).orFail(() => {
-      const error = new Error('Item not found');
-      error.statusCode = NOT_FOUND;
-      throw error;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
+    .orFail(() => new NotFoundError('Item not found'))
+    .then((item) => res.send(item))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Invalid item ID format'));
+      }
+      return next(err);
     });
-
-    return res.status(200).json(updatedItem);
-  } catch (err) {
-    console.error(err);
-
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid item ID' });
-    }
-
-    if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).json({ message: 'Item not found' });
-    }
-
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Error liking clothing item' });
-  }
 };
 
-// DELETE /items/:itemId/likes — remove a like
-const dislikeClothingItem = async (req, res) => {
-  try {
-    const { itemId } = req.params;   // FIXED
-    const userId = req.user._id;     // FIXED
+// =========================================
+// DELETE /items/:itemId/likes — dislike item
+// =========================================
+module.exports.dislikeClothingItem = (req, res, next) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
 
-    const updatedItem = await ClothingItem.findByIdAndUpdate(
-      itemId,
-      { $pull: { likes: userId } },
-      { new: true }
-    ).orFail(() => {
-      const error = new Error('Item not found');
-      error.statusCode = NOT_FOUND;
-      throw error;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
+    .orFail(() => new NotFoundError('Item not found'))
+    .then((item) => res.send(item))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Invalid item ID format'));
+      }
+      return next(err);
     });
-
-    return res.status(200).json(updatedItem);
-  } catch (err) {
-    console.error(err);
-
-    if (err.name === 'CastError') {
-      return res.status(BAD_REQUEST).json({ message: 'Invalid item ID' });
-    }
-
-    if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).json({ message: 'Item not found' });
-    }
-
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .json({ message: 'Error disliking clothing item' });
-  }
-};
-
-module.exports = {
-  getClothingItems,
-  createClothingItem,
-  deleteClothingItem,
-  likeClothingItem,
-  dislikeClothingItem,
 };
