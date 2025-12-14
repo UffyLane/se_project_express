@@ -3,24 +3,12 @@ const clothingItemsRouter = require('./clothingItems');
 const usersRouter = require('./users');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const ClothingItem = require('../models/clothingItem');
 const { validateLogin, validateCreateUser } = require('../middlewares/validation');
-
+const { NOT_FOUND } = require('../utils/errors');
 
 // ---------- PUBLIC ROUTES ----------
 router.post('/signup', validateCreateUser, createUser);
 router.post('/signin', validateLogin, login);
-
-// >>> PUBLIC GET /items <<<
-router.get("/items", async (req, res) => {
-  try {
-    const items = await ClothingItem.find({});
-    res.send(items);
-  } catch (err) {
-    res.status(500).send({ message: "Server error" });
-  }
-});
-
 
 // ---------- PROTECTED ROUTES ----------
 router.use(auth);
@@ -33,3 +21,4 @@ router.all('*', (_req, res) => {
 });
 
 module.exports = router;
+
