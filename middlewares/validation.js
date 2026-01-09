@@ -1,9 +1,7 @@
-// middlewares/validation.js
-
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
-// Custom URL validator using validator.js
+// Custom URL validator
 const urlValidation = (value, helpers) => {
   if (validator.isURL(value, { require_protocol: true })) {
     return value;
@@ -12,9 +10,10 @@ const urlValidation = (value, helpers) => {
 };
 
 // =============================
-// 1. VALIDATE CREATE CLOTHING ITEM
+// VALIDATORS
 // =============================
-module.exports.validateCreateItem = celebrate({
+
+const validateCreateItem = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     weather: Joi.string().valid('hot', 'warm', 'cold').required(),
@@ -22,10 +21,7 @@ module.exports.validateCreateItem = celebrate({
   }),
 });
 
-// =============================
-// 2. VALIDATE CREATE USER (SIGNUP)
-// =============================
-module.exports.validateCreateUser = celebrate({
+const validateCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     avatar: Joi.string().required().custom(urlValidation),
@@ -34,32 +30,35 @@ module.exports.validateCreateUser = celebrate({
   }),
 });
 
-// =============================
-// 3. VALIDATE LOGIN (SIGNIN)
-// =============================
-module.exports.validateLogin = celebrate({
+const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
 
-// =============================
-// 4. VALIDATE USER ID / ITEM ID PARAMS
-// =============================
-module.exports.validateIdParam = celebrate({
+const validateIdParam = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().hex().length(24),
     itemId: Joi.string().hex().length(24),
   }),
 });
 
-// =============================
-// 5. VALIDATE USER UPDATE (PATCH /users/me)
-// =============================
-module.exports.validateUpdateUser = celebrate({
+const validateUpdateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     avatar: Joi.string().required().custom(urlValidation),
   }),
 });
+
+// =============================
+// EXPORTS (IMPORTANT)
+// =============================
+
+module.exports = {
+  validateCreateItem,
+  validateCreateUser,
+  validateLogin,
+  validateIdParam,
+  validateUpdateUser,
+};

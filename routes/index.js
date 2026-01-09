@@ -1,6 +1,9 @@
 const router = require('express').Router();
-const clothingItemsRouter = require('./clothingItems');
+
 const usersRouter = require('./users');
+const itemsPublicRouter = require('./itemsPublic');
+const itemsProtectedRouter = require('./itemsProtected');
+
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const { validateLogin, validateCreateUser } = require('../middlewares/validation');
@@ -10,10 +13,13 @@ const { NOT_FOUND } = require('../utils/errors');
 router.post('/signup', validateCreateUser, createUser);
 router.post('/signin', validateLogin, login);
 
+// Public GET /items
+router.use('/items', itemsPublicRouter);
+
 // ---------- PROTECTED ROUTES ----------
 router.use(auth);
 router.use('/users', usersRouter);
-router.use('/items', clothingItemsRouter);
+router.use('/items', itemsProtectedRouter);
 
 // ---------- 404 CATCH-ALL ----------
 router.all('*', (_req, res) => {

@@ -45,13 +45,11 @@ module.exports.getCurrentUser = (req, res, next) => {
     });
 };
 
-// ================================
-// POST /signin — login
-// ================================
+
+//POST/login
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  // Required WTWR validation
   if (!email || !password) {
     return next(new BadRequestError('Email and password are required'));
   }
@@ -64,14 +62,11 @@ module.exports.login = (req, res, next) => {
 
       res.send({ token });
     })
-    .catch((err) => {
-      // WTWR requires checking ONLY message text
-      if (err.message.includes('Invalid email or password')) {
-        return next(new UnauthorizedError('Invalid email or password'));
-      }
-      return next(err);
+    .catch(() => {
+      next(new UnauthorizedError('Invalid email or password'));
     });
 };
+
 
 // ================================
 // POST /signup — create new user

@@ -1,4 +1,4 @@
-// middlewares/errors.js
+
 
 // HTTP status codes
 const BAD_REQUEST = 400;

@@ -1,31 +1,31 @@
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../utils/config');
-const UnauthorizedError = require('../errors/UnauthorizedError');
+// middlewares/auth.js
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
+const { UNAUTHORIZED } = require("../utils/errors");
 
 module.exports = (req, res, next) => {
-  // ✅ Allow public routes through WITHOUT auth
-  if (
-    req.path === '/signin' ||
-    req.path === '/signup'
-  ) {
-    return next();
-  }
-
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new UnauthorizedError('Authorization required'));
-  }
-
-  const token = authorization.replace('Bearer ', '');
-
-  let payload;
   try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return next(new UnauthorizedError('Authorization required'));
-  }
+    const { authorization } = req.headers;
 
-  req.user = payload;
-  return next();
+    // Must exist and be "Bearer <token>"
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
+    }
+
+    const token = authorization.replace("Bearer ", "").trim();
+    if (!token) {
+      return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
+    }
+
+    // Verify token
+    const payload = jwt.verify(token, JWT_SECRET);
+
+    // Attach user id to request
+    req.user = payload;
+
+    return next();
+  } catch (err) {
+    return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
+  }
 };
+
