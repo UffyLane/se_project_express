@@ -1,5 +1,4 @@
 
-
 // HTTP status codes
 const BAD_REQUEST = 400;
 const UNAUTHORIZED = 401;
@@ -8,40 +7,56 @@ const NOT_FOUND = 404;
 const CONFLICT = 409;
 const INTERNAL_SERVER_ERROR = 500;
 
-// Reusable error response helper
-const sendError = (res, statusCode, message) =>
-  res.status(statusCode).json({ message });
+// Error constructors (classes)
+class BadRequestError extends Error {
+  constructor(message = 'Bad request') {
+    super(message);
+    this.statusCode = BAD_REQUEST;
+  }
+}
 
-// Specific helpers (optional but convenient)
-const badRequest = (res, message = 'Bad request') =>
-  sendError(res, BAD_REQUEST, message);
+class UnauthorizedError extends Error {
+  constructor(message = 'Authorization required') {
+    super(message);
+    this.statusCode = UNAUTHORIZED;
+  }
+}
 
-const unauthorized = (res, message = 'Authorization required') =>
-  sendError(res, UNAUTHORIZED, message);
+class ForbiddenError extends Error {
+  constructor(message = 'Forbidden') {
+    super(message);
+    this.statusCode = FORBIDDEN;
+  }
+}
 
-const forbidden = (res, message = 'Forbidden') =>
-  sendError(res, FORBIDDEN, message);
+class NotFoundError extends Error {
+  constructor(message = 'Requested resource not found') {
+    super(message);
+    this.statusCode = NOT_FOUND;
+  }
+}
 
-const notFound = (res, message = 'Requested resource not found') =>
-  sendError(res, NOT_FOUND, message);
-
-const conflict = (res, message = 'Conflict') =>
-  sendError(res, CONFLICT, message);
-
-const serverError = (res, message = 'An error occurred on the server') =>
-  sendError(res, INTERNAL_SERVER_ERROR, message);
+class ConflictError extends Error {
+  constructor(message = 'Conflict') {
+    super(message);
+    this.statusCode = CONFLICT;
+  }
+}
 
 module.exports = {
+  // status codes
   BAD_REQUEST,
   UNAUTHORIZED,
   FORBIDDEN,
   NOT_FOUND,
   CONFLICT,
   INTERNAL_SERVER_ERROR,
-  badRequest,
-  unauthorized,
-  forbidden,
-  notFound,
-  conflict,
-  serverError,
+
+  // constructors
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
 };
+

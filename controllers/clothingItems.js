@@ -1,22 +1,21 @@
 const ClothingItem = require('../models/clothingItem');
 
-// Custom Error Classes
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 
-// =========================================
-// GET /items — get all clothing items
-// =========================================
+// ================================
+// GET /items — public
+// ================================
 module.exports.getClothingItems = (req, res, next) => {
   ClothingItem.find({})
-    .then((items) => res.send(items))
+    .then((items) => res.status(200).send(items))
     .catch(next);
 };
 
-// =========================================
-// POST /items — create new item
-// =========================================
+// ================================
+// POST /items — protected
+// ================================
 module.exports.createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
@@ -29,16 +28,16 @@ module.exports.createClothingItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Invalid clothing item data'));
+        return next(new BadRequestError('Invalid item data'));
       }
       return next(err);
     });
 };
 
-// =========================================
-// DELETE /items/:itemId — delete item
+// ================================
+// DELETE /items/:itemId — protected
 // Only owner can delete
-// =========================================
+// ================================
 module.exports.deleteClothingItem = (req, res, next) => {
   const { itemId } = req.params;
 
@@ -46,12 +45,12 @@ module.exports.deleteClothingItem = (req, res, next) => {
     .orFail(() => new NotFoundError('Item not found'))
     .then((item) => {
       if (String(item.owner) !== String(req.user._id)) {
-        throw new ForbiddenError('You are not allowed to delete this item');
+        throw new ForbiddenError('You do not have permission to delete this item');
       }
 
-      return item.deleteOne().then(() => {
-        res.send({ message: 'Item deleted successfully' });
-      });
+      return item
+        .deleteOne()
+        .then(() => res.status(200).send({ message: 'Item deleted' }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -61,20 +60,19 @@ module.exports.deleteClothingItem = (req, res, next) => {
     });
 };
 
-// =========================================
-// PUT /items/:itemId/likes — like an item
-// =========================================
+// ================================
+// PUT /items/:itemId/likes — protected
+// ================================
 module.exports.likeClothingItem = (req, res, next) => {
   const { itemId } = req.params;
-  const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
     itemId,
-    { $addToSet: { likes: userId } },
+    { $addToSet: { likes: req.user._id } },
     { new: true }
   )
     .orFail(() => new NotFoundError('Item not found'))
-    .then((item) => res.send(item))
+    .then((updatedItem) => res.status(200).send(updatedItem))
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Invalid item ID format'));
@@ -83,20 +81,19 @@ module.exports.likeClothingItem = (req, res, next) => {
     });
 };
 
-// =========================================
-// DELETE /items/:itemId/likes — dislike item
-// =========================================
+// ================================
+// DELETE /items/:itemId/likes — protected
+// ================================
 module.exports.dislikeClothingItem = (req, res, next) => {
   const { itemId } = req.params;
-  const userId = req.user._id;
 
   ClothingItem.findByIdAndUpdate(
     itemId,
-    { $pull: { likes: userId } },
+    { $pull: { likes: req.user._id } },
     { new: true }
   )
     .orFail(() => new NotFoundError('Item not found'))
-    .then((item) => res.send(item))
+    .then((updatedItem) => res.status(200).send(updatedItem))
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestError('Invalid item ID format'));
@@ -104,4 +101,3 @@ module.exports.dislikeClothingItem = (req, res, next) => {
       return next(err);
     });
 };
-

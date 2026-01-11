@@ -3,13 +3,13 @@ module.exports = {
     {
       name: "wtwr-api",
       script: "app.js",
-      watch: false,
+      cwd: "/home/uffylane07/se_project_express",
+      instances: 1,
+      exec_mode: "fork",
       env: {
-        PORT: "3001",
-        MONGO_URI:
-          "mongodb://wtwrAdmin:ChangeThisPasswordNow123!@127.0.0.1:27017/wtwr_db?authSource=admin",
-        JWT_SECRET: "dev-secret",
-      },
-    },
-  ],
+        NODE_ENV: "production",
+        PORT: 3001
+      }
+    }
+  ]
 };

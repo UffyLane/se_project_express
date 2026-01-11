@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const auth = require('../middlewares/auth');
 
 const {
   getClothingItems,
@@ -9,18 +8,26 @@ const {
   dislikeClothingItem,
 } = require('../controllers/clothingItems');
 
-const { validateCreateItem, validateIdParam } = require('../middlewares/validation');
+const auth = require('../middlewares/auth');
 
+const {
+  validateCreateItem,
+  validateIdParam,
+} = require('../middlewares/validation');
+
+// ================================
 // PUBLIC
+// ================================
 router.get('/', getClothingItems);
 
-// PROTECTED (everything below requires JWT)
-router.use(auth);
+// ================================
+// PROTECTED
+// ================================
+router.post('/', auth, validateCreateItem, createClothingItem);
 
-router.post('/', validateCreateItem, createClothingItem);
-router.delete('/:itemId', validateIdParam, deleteClothingItem);
-router.put('/:itemId/likes', validateIdParam, likeClothingItem);
-router.delete('/:itemId/likes', validateIdParam, dislikeClothingItem);
+router.delete('/:itemId', auth, validateIdParam, deleteClothingItem);
+
+router.put('/:itemId/likes', auth, validateIdParam, likeClothingItem);
+router.delete('/:itemId/likes', auth, validateIdParam, dislikeClothingItem);
 
 module.exports = router;
-

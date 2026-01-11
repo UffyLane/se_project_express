@@ -1,12 +1,14 @@
-const jwt = require('jsonwebtoken');
+
+
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const { JWT_SECRET } = require('../utils/config');
 const User = require('../models/user');
 
 // Custom Error Classes
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
@@ -15,6 +17,7 @@ const ConflictError = require('../errors/ConflictError');
 // ================================
 module.exports.getProfile = (req, res, next) => {
   User.findById(req.params.userId)
+    .select('-password')
     .then((user) => {
       if (!user) {
         throw new NotFoundError('No user with matching ID found');
@@ -45,8 +48,9 @@ module.exports.getCurrentUser = (req, res, next) => {
     });
 };
 
-
-//POST/login
+// ================================
+// POST /signin (login)
+// ================================
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -60,13 +64,10 @@ module.exports.login = (req, res, next) => {
         expiresIn: '7d',
       });
 
-      res.send({ token });
+      return res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Invalid email or password'));
-    });
+    .catch(() => next(new UnauthorizedError('Invalid email or password')));
 };
-
 
 // ================================
 // POST /signup — create new user
@@ -78,7 +79,7 @@ module.exports.createUser = (req, res, next) => {
     return next(new BadRequestError('Email and password are required'));
   }
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hash) =>
       User.create({
@@ -92,7 +93,7 @@ module.exports.createUser = (req, res, next) => {
       const userWithoutPassword = user.toObject();
       delete userWithoutPassword.password;
 
-      res.status(201).send(userWithoutPassword);
+      return res.status(201).send(userWithoutPassword);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -111,17 +112,22 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateCurrentUser = (req, res, next) => {
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
   )
+    .select('-password')
     .orFail(() => new NotFoundError('User not found'))
     .then((updatedUser) => res.send(updatedUser))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError('Invalid user data'));
       }
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Invalid user data'));
+      }
       return next(err);
     });
 };
+

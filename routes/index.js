@@ -1,30 +1,16 @@
 const router = require('express').Router();
 
-const usersRouter = require('./users');
-const itemsPublicRouter = require('./itemsPublic');
-const itemsProtectedRouter = require('./itemsProtected');
+const userRouter = require('./users');
+const itemRouter = require('./clothingItems');
 
-const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-const { validateLogin, validateCreateUser } = require('../middlewares/validation');
-const { NOT_FOUND } = require('../utils/errors');
 
-// ---------- PUBLIC ROUTES ----------
-router.post('/signup', validateCreateUser, createUser);
-router.post('/signin', validateLogin, login);
+// USERS (protected)
+router.use('/users', auth, userRouter);
 
-// Public GET /items
-router.use('/items', itemsPublicRouter);
-
-// ---------- PROTECTED ROUTES ----------
-router.use(auth);
-router.use('/users', usersRouter);
-router.use('/items', itemsProtectedRouter);
-
-// ---------- 404 CATCH-ALL ----------
-router.all('*', (_req, res) => {
-  res.status(NOT_FOUND).json({ message: 'Requested resource not found' });
-});
+// ITEMS
+// GET /items is public inside itemRouter
+// POST/DELETE/LIKES are protected inside itemRouter
+router.use('/items', itemRouter);
 
 module.exports = router;
-
