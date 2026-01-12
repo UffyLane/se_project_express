@@ -5,14 +5,30 @@ It provides endpoints for creating, reading, updating (likes), and deleting clot
 
 ---
 
+## 🌐 Live Deployment
+
+**Frontend:**
+https://uffywtwr.twilightparadox.com 
+
+**Backend API:** 
+https://api.uffywtwr.twilightparadox.com
+
+
+
+
+
+
+
+
+
 ## ⚙️ Tech Stack
 
-- **Node.js** + **Express.js** — Server framework  
-- **MongoDB** + **Mongoose** — Database and ODM  
-- **ESLint (Airbnb style)** + **Prettier** — Code quality and formatting  
-- **Nodemon** — Auto-reload for development  
-- **CORS Middleware** — Cross-origin requests  
-- **Validator.js** — Data validation  
+- **Node.js** + **Express.js** — Server framewok 
+- **MongoDB** + **Mongoose** — Database and ODM
+- **ESLint (Airbnb style)** + **Prettier** — Code quality and formatting
+- **Nodemon** — Auto-reload for development 
+- **CORS Middleware** — Cross-origin requests 
+- **Validator.js** — Data validation 
 - **RESTful API Principles**
 
 ---
