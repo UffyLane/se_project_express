@@ -1,31 +1,33 @@
+
+
 // middlewares/auth.js
-const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../utils/config");
-const { UNAUTHORIZED } = require("../utils/errors");
+const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/UnauthorizedError'); // adjust path if yours differs
+const { JWT_SECRET } = require('../utils/config'); // adjust if your config path differs
 
-module.exports = (req, res, next) => {
-  try {
-    const { authorization } = req.headers;
+module.exports = (req, _res, next) => {
+  const { authorization } = req.headers;
 
-    // Must exist and be "Bearer <token>"
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
-    }
-
-    const token = authorization.replace("Bearer ", "").trim();
-    if (!token) {
-      return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
-    }
-
-    // Verify token
-    const payload = jwt.verify(token, JWT_SECRET);
-
-    // Attach user id to request
-    req.user = payload;
-
-    return next();
-  } catch (err) {
-    return res.status(UNAUTHORIZED).json({ message: "Authorization required" });
+  // Missing header or not Bearer
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return next(new UnauthorizedError('Authorization required'));
   }
-};
 
+  const token = authorization.replace('Bearer ', '').trim();
+
+  // "Bearer " with no token
+  if (!token) {
+    return next(new UnauthorizedError('Authorization required'));
+  }
+
+  let payload;
+
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return next(new UnauthorizedError('Authorization required'));
+  }
+
+  req.user = payload; // should contain {_id: "..."} from your login token
+  return next();
+};

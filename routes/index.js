@@ -1,16 +1,17 @@
-const router = require('express').Router();
+const router = require("express").Router();
 
-const userRouter = require('./users');
-const itemRouter = require('./clothingItems');
+const { login, createUser } = require("../controllers/users");
+const auth = require("../middlewares/auth");
 
-const auth = require('../middlewares/auth');
+const userRouter = require("./users");
+const itemRouter = require("./clothingItems");
 
-// USERS (protected)
-router.use('/users', auth, userRouter);
+// PUBLIC AUTH ROUTES
+router.post("/signin", login);
+router.post("/signup", createUser);
 
-// ITEMS
-// GET /items is public inside itemRouter
-// POST/DELETE/LIKES are protected inside itemRouter
-router.use('/items', itemRouter);
+// PROTECTED ROUTES
+router.use("/users", auth, userRouter);
+router.use("/items", itemRouter);
 
 module.exports = router;

@@ -54,19 +54,19 @@ module.exports.getCurrentUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return next(new BadRequestError('Email and password are required'));
-  }
-
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
-
-      return res.send({ token });
+      res.send({ token });
     })
-    .catch(() => next(new UnauthorizedError('Invalid email or password')));
+    .catch((err) => {
+      if (err.message === 'Invalid email or password') {
+        return next(new UnauthorizedError('Invalid email or password'));
+      }
+      return next(err);
+    });
 };
 
 // ================================
