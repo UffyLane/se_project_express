@@ -9,7 +9,7 @@ const { errors } = require("celebrate");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
-
+const rateLimiter = require("./middlewares/rateLimiter");
 const app = express();
 const { PORT = 3001 } = process.env;
 
@@ -55,6 +55,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(rateLimiter);
 
 // Prevent favicon 401
 app.get("/favicon.ico", (_req, res) => res.sendStatus(204));
