@@ -14,3 +14,7 @@ node_modules
 .idea
 .vscode
 .env
+
+# local eslint backups
+.eslintrc.bak.*
+.eslintrc.bad.*

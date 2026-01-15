@@ -51,8 +51,13 @@ module.exports.getCurrentUser = (req, res, next) => {
 // ================================
 // POST /signin (login)
 // ================================
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).send({ message: "Email and password are required" });
+  }
 
   User.findUserByCredentials(email, password)
     .then((user) => {
