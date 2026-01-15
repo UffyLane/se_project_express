@@ -94,7 +94,7 @@ app.use(errorHandler);
 
 // ---------- START SERVER ----------
 app.listen(PORT, "127.0.0.1", () => {
-  console.log(`🚀 Backend running at http://127.0.0.1:${PORT}`);
+  console.warn(`🚀 Backend running at http://127.0.0.1:${PORT}`);
 });
 
 module.exports = app;
