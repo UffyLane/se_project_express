@@ -7,6 +7,9 @@ const rateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many requests, please try again later." },
+
+  // Prevent validation error when behind reverse proxy setups
+  validate: { xForwardedForHeader: false },
 });
 
 module.exports = rateLimiter;

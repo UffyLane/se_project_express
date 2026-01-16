@@ -301,9 +301,7 @@ Ready for future integration with authentication
 
 ## Project Pitch Video
  
- Check out [this video](https://drive.google.com/file/d/1pmrpI_lWSCbW2T_Jc3rlDDFZBXiNsZu9/view?usp=sharing), where I describe my 
- project and some challenges I faced while building it.
-
+https://www.loom.com/share/d30f15893be24955837064d420180e12
 
 ### 👤 Author
 
