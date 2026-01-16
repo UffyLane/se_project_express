@@ -11,6 +11,8 @@ const errorHandler = require("./middlewares/errorHandler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const rateLimiter = require("./middlewares/rateLimiter");
 const app = express();
+app.set("trust proxy", 1);
+
 const { PORT = 3001 } = process.env;
 
 // MongoDB URL
