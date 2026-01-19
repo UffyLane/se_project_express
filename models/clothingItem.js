@@ -21,7 +21,7 @@ const clothingItemSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    required: false,
+    required: true,
   },
 
   createdAt: {
@@ -40,7 +40,7 @@ const clothingItemSchema = new mongoose.Schema({
   // Allows existing old items in the DB that do not have imageUrl
   imageUrl: {
     type: String,
-    required: false, // <-- IMPORTANT FIX
+    required: true,
     validate: {
       validator: (v) => !v || validator.isURL(v), // allow empty OR valid URL
       message: 'Invalid image URL',
