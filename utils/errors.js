@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 
 // HTTP status codes
 const BAD_REQUEST = 400;
