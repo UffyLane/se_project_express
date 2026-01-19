@@ -8,7 +8,6 @@ const User = require('../models/user');
 
 // Custom Error Classes
 const BadRequestError = require('../errors/BadRequestError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 
@@ -59,17 +58,21 @@ module.exports.login = (req, res, next) => {
     return res.status(400).send({ message: "Email and password are required" });
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: '7d',
-      });
-      res.send({ token });
+      const token = jwt.sign(
+        { _id: user._id },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      return res.status(200).send({ token });
     })
     .catch((err) => {
-      if (err.message === 'Invalid email or password') {
-        return next(new UnauthorizedError('Invalid email or password'));
+      if (err.message === "Invalid email or password") {
+        return res.status(401).send({ message: err.message });
       }
+
       return next(err);
     });
 };
