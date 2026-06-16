@@ -1,310 +1,163 @@
-# 🧥 WTWR Express Backend
+# WTWR Express Backend
 
-This is the **backend API** for the *What to Wear (WTWR)* application — a Node.js and Express server that manages user data and clothing items.  
-It provides endpoints for creating, reading, updating (likes), and deleting clothing items, as well as managing user profiles.
+> **REST API for the What to Wear (WTWR) application.**
 
----
-
-## 🌐 Live Deployment
-
-**Frontend:**
-https://uffywtwr.twilightparadox.com 
-
-**Backend API:** 
-https://api.uffywtwr.twilightparadox.com
-
-
-
-
-
-
-
-
-
-## ⚙️ Tech Stack
-
-- **Node.js** + **Express.js** — Server framewok 
-- **MongoDB** + **Mongoose** — Database and ODM
-- **ESLint (Airbnb style)** + **Prettier** — Code quality and formatting
-- **Nodemon** — Auto-reload for development 
-- **CORS Middleware** — Cross-origin requests 
-- **Validator.js** — Data validation 
-- **RESTful API Principles**
+⚙️ **[Live API](https://wtwr-api-y96m.onrender.com)** | 🌤️ **[Frontend App](https://uffywtwr.vercel.app)**
 
 ---
 
-## 📁 Project Structure
+## About
 
+This is the backend API for WTWR — a weather-based clothing recommendation app. It handles user authentication, clothing item management, and profile data. Built with Node.js, Express, and MongoDB following MVC architecture.
+
+---
+
+## Live Deployment
+
+- **Frontend:** https://uffywtwr.vercel.app
+- **Backend API:** https://wtwr-api-y96m.onrender.com
+
+> Note: Hosted on Render's free tier — first request may take ~50 seconds to wake up.
+
+---
+
+## Test Credentials
+
+Use these to test authenticated endpoints:
+
+- **Email:** test@wtwr.com
+- **Password:** Test1234!
+
+Or create your own account via `POST /signup`.
+
+---
+
+## Tech Stack
+
+- Node.js + Express.js
+- MongoDB + Mongoose
+- JWT authentication
+- bcrypt password hashing
+- Celebrate / Joi input validation
+- Winston logging
+- Helmet security headers
+- Rate limiting
+- ESLint (Airbnb style)
+
+---
+
+## Project Structure
+
+```
 se_project_express/
 │
 ├── controllers/
-│ ├── clothingItems.js
-│ └── users.js
+│   ├── clothingItems.js   # Item CRUD logic
+│   └── users.js           # User auth and profile logic
 │
 ├── models/
-│ ├── clothingItem.js
-│ └── user.js
+│   ├── clothingItem.js    # Mongoose schema for items
+│   └── user.js            # Mongoose schema for users
 │
 ├── routes/
-│ ├── clothingItems.js
-│ ├── users.js
-│ └── index.js
+│   ├── clothingItems.js
+│   ├── users.js
+│   └── index.js
+│
+├── middlewares/
+│   ├── auth.js            # JWT verification
+│   └── errorHandler.js    # Centralized error handling
 │
 ├── utils/
-│ └── errors.js
+│   └── errors.js          # Custom error constants
 │
-├── app.js
-├── .eslintrc.json
-├── package.json
-└── README.md
-
+└── app.js
+```
 
 ---
 
-## 🚀 Getting Started
+## Running Locally
 
-### 1. Clone the Repository
-
+```bash
 git clone https://github.com/UffyLane/se_project_express.git
 cd se_project_express
-
-
-### Install Dependencies 
-
 npm install
-npm start
+```
 
-server runs on : 👉 http://localhost:3001
+Create `.env`:
+```
+PORT=3001
+MONGO_URI=mongodb://127.0.0.1:27017/wtwr_db
+JWT_SECRET=your_jwt_secret
+NODE_ENV=development
+```
 
+```bash
+npm run dev
+# server runs at http://localhost:3001
+```
 
-### MongoDB Setup
+---
 
-mongodb://127.0.0.1:27017/wtwr_db
+## API Endpoints
 
+### Authentication
 
-### API Endpoints
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/signup` | No | Create account |
+| POST | `/signin` | No | Log in, receive JWT |
 
- 👕 Clothing Items
+### Users
 
-| Method     | Endpoint           | Description                |
-| ---------- | ------------------ | -------------------------- |
-| **GET**    | `/items`           | Get all clothing items     |
-| **POST**   | `/items`           | Create a new clothing item |
-| **DELETE** | `/items/:id`       | Delete an item by ID       |
-| **PUT**    | `/items/:id/likes` | Like an item               |
-| **DELETE** | `/items/:id/likes` | Remove like from an item   |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/users/me` | Yes | Get current user |
+| PATCH | `/users/me` | Yes | Update name and avatar |
 
-🧍 Users
+### Clothing Items
 
-| Method   | Endpoint     | Description       |
-| -------- | ------------ | ----------------- |
-| **GET**  | `/users`     | Get all users     |
-| **POST** | `/users`     | Create a new user |
-| **GET**  | `/users/:id` | Get a user by ID  |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/items` | No | Get all clothing items |
+| POST | `/items` | Yes | Add a clothing item |
+| DELETE | `/items/:id` | Yes | Delete an item (owner only) |
+| PUT | `/items/:id/likes` | Yes | Like an item |
+| DELETE | `/items/:id/likes` | Yes | Remove like |
 
+---
 
+## Error Handling
 
+| Status | Description |
+|--------|-------------|
+| 400 | Bad request — invalid input |
+| 401 | Unauthorized — missing or invalid JWT |
+| 403 | Forbidden — not the item owner |
+| 404 | Not found |
+| 409 | Conflict — email already exists |
+| 500 | Internal server error |
 
+---
 
-### 🧩 Example Requests & Responses
+## Security
 
-➕ Create a Clothing Item 
+- Passwords hashed with bcrypt
+- JWT tokens for session management
+- Helmet security headers
+- Rate limiting on all routes
+- Input validation with Celebrate/Joi
+- `.orFail()` on Mongoose queries to prevent silent failures
 
-Request:
+---
 
-POST /items
-Content-Type: application/json
+## Author
 
- Body:
+**Stuart G. Clark Jr.**
+[GitHub](https://github.com/UffyLane)
 
-{
-  "name": "Blue Hoodie",
-  "weather": "cold",
-  "imageUrl": "https://example.com/hoodie.png"
-}
+---
 
+## License
 
- Response:
-
-{
-  "_id": "6731e54f22a839dc02b4f987",
-  "name": "Blue Hoodie",
-  "weather": "cold",
-  "imageUrl": "https://example.com/hoodie.png",
-  "likes": [],
-  "owner": "000000000000000000000001",
-  "createdAt": "2025-11-05T08:30:00.000Z"
-}
-
-🧾 Get All Clothing Items
-
-Request:
-
-GET /items
-
-
-Response: 
-
-[
-  {
-    "_id": "6731e54f22a839dc02b4f987",
-    "name": "Hoodie",
-    "weather": "cold",
-    "imageUrl": "https://example.com/hoodie.png",
-    "likes": [],
-    "owner": "000000000000000000000001",
-    "createdAt": "2025-11-05T08:30:00.000Z"
-  },
-  {
-    "_id": "6731e54f22a839dc02b4f988",
-    "name": "Cap",
-    "weather": "hot",
-    "imageUrl": "https://example.com/cap.png",
-    "likes": ["000000000000000000000001"],
-    "owner": "000000000000000000000001",
-    "createdAt": "2025-11-05T09:00:00.000Z"
-  }
-]
-
-❤️ Like a Clothing Item
-
-Request: 
-
-PUT /items/6731e54f22a839dc02b4f987/likes
-
-
-Response:
-
-{
-  "_id": "6731e54f22a839dc02b4f987",
-  "name": "Hoodie",
-  "weather": "cold",
-  "likes": ["000000000000000000000001"],
-  "owner": "000000000000000000000001",
-  "imageUrl": "https://example.com/hoodie.png"
-}
-
-
-💔 Remove Like from a Clothing Item
-
-Request:
-
-DELETE /items/6731e54f22a839dc02b4f987/likes
-
-Response:
-
-{
-  "_id": "6731e54f22a839dc02b4f987",
-  "name": "Hoodie",
-  "weather": "cold",
-  "likes": [],
-  "owner": "000000000000000000000001",
-  "imageUrl": "https://example.com/hoodie.png"
-}
-
-➕ Create a User
-
-Request:
-
-POST /users
-Content-Type: application/json
-
-
-Body:
-
-{
-  "name": "Stuart Clark",
-  "avatar": "https://example.com/avatar.jpg"
-}
-
-
-Response:
-
-{
-  "_id": "6731e52a22a839dc02b4f123",
-  "name": "Stuart Clark",
-  "avatar": "https://example.com/avatar.jpg",
-  "__v": 0
-}
-
-👀 Get All Users
-
-Request:
-
-GET /users
-
-
-Response:
-
-[
-  {
-    "_id": "6731e52a22a839dc02b4f123",
-    "name": "Stuart Clark",
-    "avatar": "https://example.com/avatar.jpg"
-  },
-  {
-    "_id": "6731e52a22a839dc02b4f124",
-    "name": "Sarah Green",
-    "avatar": "https://example.com/sarah.png"
-  }
-]
-
-🔎 Get User by ID
-
-Request:
-
-GET /users/6731e52a22a839dc02b4f123
-
-
-Response:
-
-{
-  "_id": "6731e52a22a839dc02b4f123",
-  "name": "Stuart Clark",
-  "avatar": "https://example.com/avatar.jpg"
-}
-
-
-
-### 🚨 Error Handling
-
-| Status Code | Constant                | Description                    |
-| ----------- | ----------------------- | ------------------------------ |
-| **400**     | `BAD_REQUEST`           | Invalid input data             |
-| **401**     | `UNAUTHORIZED`          | Missing or invalid credentials |
-| **403**     | `FORBIDDEN`             | Access not allowed             |
-| **404**     | `NOT_FOUND`             | Resource not found             |
-| **500**     | `INTERNAL_SERVER_ERROR` | Server error                   |
-
-
-### ✨ Linting & Code Quality
-
-Run ESLint: npx eslint .
-
-### Configuration Highlights
-
-"no-console": ["warn", { "allow": ["warn", "error"] }],
-"no-underscore-dangle": ["error", { "allow": ["_id"] }]
-
-
-### Key Features
-
-Organized MVC architecture
-
-Centralized error constants
-
-Input validation for URLs, IDs, and required fields
-
-Uses .orFail() for Mongoose not-found safety
-
-Ready for future integration with authentication
-
-## Project Pitch Video
- 
-https://www.loom.com/share/d30f15893be24955837064d420180e12
-
-### 👤 Author
-
-Stuart G. Clark Jr.
-📍 Developer & Creator of WTWR Express Backend
-🗓️ 2025
+MIT
