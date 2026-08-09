@@ -25,8 +25,7 @@ const MONGO_URI =
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  "http://uffywtwr.twilightparadox.com",
-  "https://uffywtwr.twilightparadox.com",
+  "https://uffywtwr.vercel.app",
 ];
 
 app.use(
